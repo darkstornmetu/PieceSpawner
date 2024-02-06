@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f56261a1829f3b4386e1b4e52ba651b, type: 3}
+  m_Name: RocketMatSet
+  m_EditorClassIdentifier: 
+  _pieceDataArray:
+  - Type: 0
+    Data: {fileID: 2100000, guid: d8c9d3a724c4ec84196c4fc41bc70e0c, type: 2}
+  - Type: 1
+    Data: {fileID: 2100000, guid: e16c703d1c608204f94497afd596055b, type: 2}
+  - Type: 2
+    Data: {fileID: 2100000, guid: 7218fe8756e9ddb45a5cc3a0c85d056d, type: 2}
+  - Type: 3
+    Data: {fileID: 2100000, guid: e6dde36c5ba95d140b86002f75fb7212, type: 2}
+  - Type: 4
+    Data: {fileID: 2100000, guid: 57a749cc063b99c498bfaad04506a2eb, type: 2}
+  - Type: 5
+    Data: {fileID: 2100000, guid: a3f60ad283ab1c348a5757c8d48d06da, type: 2}

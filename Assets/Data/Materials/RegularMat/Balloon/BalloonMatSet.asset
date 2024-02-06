@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f56261a1829f3b4386e1b4e52ba651b, type: 3}
+  m_Name: BalloonMatSet
+  m_EditorClassIdentifier: 
+  _pieceDataArray:
+  - Type: 0
+    Data: {fileID: 2100000, guid: 708c6c4d31d272a4c96387a165164cc0, type: 2}
+  - Type: 1
+    Data: {fileID: 2100000, guid: a6dc8f21d4ff876438398bfa10fa0223, type: 2}
+  - Type: 2
+    Data: {fileID: 2100000, guid: 0c3b55b16bf0b844eb20dc3d455bd5db, type: 2}
+  - Type: 3
+    Data: {fileID: 2100000, guid: 960e10aef9f61474fb383f44ebc49b3c, type: 2}
+  - Type: 4
+    Data: {fileID: 2100000, guid: b7b71a36bdbd6d14ab5cf0ad6aaafb17, type: 2}
+  - Type: 5
+    Data: {fileID: 2100000, guid: fdafa63364f9e4e418780d4ef73e8906, type: 2}

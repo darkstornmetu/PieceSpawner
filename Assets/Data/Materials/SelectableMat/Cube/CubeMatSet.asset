@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f56261a1829f3b4386e1b4e52ba651b, type: 3}
+  m_Name: CubeMatSet
+  m_EditorClassIdentifier: 
+  _pieceDataArray:
+  - Type: 0
+    Data: {fileID: 2100000, guid: 78976c55b580eef4f8965f919466ba59, type: 2}
+  - Type: 1
+    Data: {fileID: 2100000, guid: 38681312e8050134cb4983238986902a, type: 2}
+  - Type: 2
+    Data: {fileID: 2100000, guid: 468c3fe469b5abd4fb1a89596592e18b, type: 2}
+  - Type: 3
+    Data: {fileID: 2100000, guid: acabd6efba2b87644a1aaa9e7bc89123, type: 2}
+  - Type: 4
+    Data: {fileID: 2100000, guid: d2965043db934784c819413ee0af1757, type: 2}
+  - Type: 5
+    Data: {fileID: 2100000, guid: b7708f1f10ca5d640b87d9ad714ca571, type: 2}
