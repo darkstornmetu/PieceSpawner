@@ -15,7 +15,7 @@ public class PieceSpawner : EditorWindow
     private PieceMaterialSet _pieceMaterialSet;
     private PieceThemeSet _themeSet;
     
-    private PieceGridItem[] _pieceGrid;
+    private Grid<PieceGridItem> _pieceGrid;
     
     private float _circleSize;
 
@@ -28,6 +28,8 @@ public class PieceSpawner : EditorWindow
     private PieceColors _colorType;
     
     private string _savePath;
+
+    private Color _defaultColor;
     
     private void OnGUI()
     {
@@ -50,7 +52,7 @@ public class PieceSpawner : EditorWindow
         
         _gridSize.x = EditorGUILayout.IntSlider("Grid Size X", _gridSize.x, 1, 20);
         _gridSize.y = EditorGUILayout.IntSlider("Grid Size Y", _gridSize.y, 1, 20);
-        
+
         if (EditorGUI.EndChangeCheck())
         {
             UpdateGridContent();
@@ -78,7 +80,7 @@ public class PieceSpawner : EditorWindow
 
             if (GUILayout.Button("Reset Grid"))
             {
-                _pieceGrid = new PieceGridItem[_gridSize.x * _gridSize.y];
+                _pieceGrid = new Grid<PieceGridItem>(_gridSize.x, _gridSize.y);
                 UpdateGridContent();
             }
         }
@@ -93,26 +95,28 @@ public class PieceSpawner : EditorWindow
 
     private void UpdateGridContent()
     {
-        if(_pieceIconSet == null || _pieceMaterialSet == null)
-            return;
-        
-        PieceGridItem[] prevGrid = _pieceGrid;
+        Grid<PieceGridItem> prevGrid = _pieceGrid;
         Vector2Int prevGridSize = _lastGridSize;
-        Color defaultColor = _pieceMaterialSet.GetDataByEnum(default).color;
-        
-        _pieceGrid = new PieceGridItem[_gridSize.x * _gridSize.y];
+
+        _pieceGrid = new Grid<PieceGridItem>(_gridSize.x, _gridSize.y);
 
         for (int y = 0; y < _gridSize.y; y++)
         {
             for (int x = 0; x < _gridSize.x; x++)
             {
-                int index = GetIndexFromCoords(x, y, _gridSize.x);
-                
-                if (prevGrid != null && x < prevGridSize.x && y < prevGridSize.y && prevGrid[index] != null)
-                    _pieceGrid[index] = prevGrid[index];
+                Vector2Int coords = new Vector2Int(x, y);
+
+                if (prevGrid != null && x < prevGridSize.x && y < prevGridSize.y
+                    && prevGrid.TryGetItem(coords, out PieceGridItem item))
+                {
+                    _pieceGrid.SetItem(item, coords);
+                }
+
                 else
-                    _pieceGrid[index] = new PieceGridItem(default, default,
-                        new GUIContent(CreateCircleTexture((int)_circleSize, defaultColor)));
+                {
+                    _pieceGrid.SetItem(new PieceGridItem(default, default,
+                        new GUIContent(CreateCircleTexture((int)_circleSize, _defaultColor))), coords);
+                }
             }
         }
     }
@@ -127,11 +131,11 @@ public class PieceSpawner : EditorWindow
         _gridSize.x = width;
         _gridSize.y = height;
 
-        _pieceGrid = new PieceGridItem[width * height];
+        _pieceGrid = new Grid<PieceGridItem>(width, height);
         
         foreach (var piece in pieces)
         {
-            Vector2Int coord = piece.GridCoords;
+            Vector2Int coords = piece.GridCoords;
             
             Color color = _pieceMaterialSet.GetDataByEnum(piece.PieceColor).color;
             Sprite pieceSprite = _pieceIconSet.GetDataByEnum(piece.PieceType);
@@ -144,8 +148,7 @@ public class PieceSpawner : EditorWindow
             else
                 content = new GUIContent(CreateCircleTexture((int)_circleSize, color));
 
-            int index = GetIndexFromCoords(coord.x, coord.y, _gridSize.x);
-            _pieceGrid[index] = new PieceGridItem(piece.PieceType, piece.PieceColor, content);
+            _pieceGrid.SetItem(new PieceGridItem(piece.PieceType, piece.PieceColor, content), coords);
         }
         
         UpdateGridContent();
@@ -153,9 +156,8 @@ public class PieceSpawner : EditorWindow
 
     private void DrawGrid()
     {
-        if(_pieceIconSet == null || _pieceMaterialSet == null || _pieceGrid == null)
-            return;
-        
+        if (_pieceMaterialSet == null || _pieceIconSet == null) return;
+
         GUILayout.BeginVertical();
 
         for (int y = _gridSize.y - 1; y >= 0; y--)
@@ -165,21 +167,25 @@ public class PieceSpawner : EditorWindow
             
             for (int x = 0; x < _gridSize.x; x++)
             {
-                int index = GetIndexFromCoords(x, y, _gridSize.x);
-                
-                if (GUILayout.Button(_pieceGrid[index].GUIContent, GUILayout.Width(_circleSize), 
+                Vector2Int coords = new Vector2Int(x, y);
+
+                var pieceGridItem = _pieceGrid.GetItem(coords);
+
+                pieceGridItem.GUIContent ??= new GUIContent(CreateCircleTexture((int)_circleSize, _defaultColor));
+
+                if (GUILayout.Button(pieceGridItem.GUIContent, GUILayout.Width(_circleSize), 
                         GUILayout.Height(_circleSize)))
                 {
-                    _pieceGrid[index].Type = _pieceType;
-                    _pieceGrid[index].Color = _colorType;
+                    pieceGridItem.Type = _pieceType;
+                    pieceGridItem.Color = _colorType;
 
                     Color color = _pieceMaterialSet.GetDataByEnum(_colorType).color;
                     Sprite pieceSprite = _pieceIconSet.GetDataByEnum(_pieceType);
 
                     if (pieceSprite != null)
-                        _pieceGrid[index].GUIContent = new GUIContent(CreateCircleTexture((int)_circleSize, color, pieceSprite.texture));
+                        pieceGridItem.GUIContent = new GUIContent(CreateCircleTexture((int)_circleSize, color, pieceSprite.texture));
                     else
-                        _pieceGrid[index].GUIContent = new GUIContent(CreateCircleTexture((int)_circleSize, color));
+                        pieceGridItem.GUIContent = new GUIContent(CreateCircleTexture((int)_circleSize, color));
                 }
             }
 
@@ -224,7 +230,7 @@ public class PieceSpawner : EditorWindow
         return texture;
     }
 
-    private void SpawnSelectedPieces(PieceGridItem[] pieceGrid)
+    private void SpawnSelectedPieces(Grid<PieceGridItem> pieceGrid)
     {
         if (string.IsNullOrWhiteSpace(_savePath)) 
             _savePath = EditorUtility.OpenFolderPanel("Select Save Path", "", "");
@@ -243,16 +249,18 @@ public class PieceSpawner : EditorWindow
                 currentPos.x += (_gridSize.x - 1) * _widthIncrement / 2f;
                 currentPos.z -= (_gridSize.y - 1) * _heightIncrement / 2f;
 
-                int index = GetIndexFromCoords(x, y, _gridSize.x);
+                Vector2Int coords = new Vector2Int(x, y);
+
+                var pieceGridItem = _pieceGrid.GetItem(coords);
                 
-                PieceTypes currentType = pieceGrid[index].Type;
-                PieceColors currentColor = pieceGrid[index].Color;
+                PieceTypes currentType = pieceGridItem.Type;
+                PieceColors currentColor = pieceGridItem.Color;
                 
                 Piece piecePrefab = _piecePrefabSet.GetDataByEnum(currentType);
 
                 Piece piece = PrefabUtility.InstantiatePrefab(piecePrefab, parentObject.transform) as Piece;
                 piece.transform.localPosition = currentPos;
-                piece.SetGridCoordinates(new Vector2Int(x,y));
+                piece.SetGridCoordinates(coords);
                 piece.SetColor(currentColor);
                 piece.SetType(currentType);
 
@@ -280,19 +288,16 @@ public class PieceSpawner : EditorWindow
         
         DestroyImmediate(parentObject);
     }
-    
-    private int GetIndexFromCoords(int x, int y, int width)
-    {
-        return y * width + x;
-    }
 
     private void Awake()
     {
-        _pieceGrid = new PieceGridItem[_gridSize.x * _gridSize.y];
+        _pieceGrid = new Grid<PieceGridItem>(_gridSize.x, _gridSize.y);
+        _defaultColor = Color.gray;
+        UpdateGridContent();
     }
     
     [Serializable]
-    private class PieceGridItem
+    private class PieceGridItem : IGridItem
     {
         public PieceTypes Type;
         public PieceColors Color;
@@ -304,6 +309,8 @@ public class PieceSpawner : EditorWindow
             Color = color;
             GUIContent = content;
         }
+
+        public Vector2Int GridCoords { get ; set ; }
     }
 }
 
